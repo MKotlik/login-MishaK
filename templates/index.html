@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Misha - Log In</title>
+		<style>
+			* {
+				font-family: Helvetica, Arial, sans-serif;
+			}
+			.center {
+				margin: auto;
+			}.spaced {
+				margin-bottom: 10px;
+			}
+			div {
+				text-align: center;
+				margin-bottom: 10px;
+			}
+			h1, h3 {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 class = "center spaced">Test Login Site</h1>
+		<h3 class = "center spaced">by Misha Kotlik</h3>
+		
+		<div class = "center">Please log in to continue</div>
+		
+		<form class = "center" method = "POST" action="/auth/">
+			<input type="text" name="user">
+			<br>
+			<input type="password" name="pass">
+			<br>
+			<input type="submit" name="Sign In">
+		</form>
+	</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Misha - Auth</title>
+		<style>
+			* {
+				font-family: Helvetica, Arial, sans-serif;
+			}
+			.center {
+				margin: auto;
+			}.spaced {
+				margin-bottom: 10px;
+			}
+			div {
+				text-align: center;
+				margin-bottom: 10px;
+			}
+			h1, h3 {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 class = "center spaced">Test Login Site</h1>
+		<h3 class = "center spaced">by Misha Kotlik</h3>
+		
+		{% if status == 0 %}
+		<div class = "center">Please log in first</div>
+		{% elif status == 1 %}
+		<div class = "center">You have logged in</div>
+		{% else %}
+		<div class = "center">Wrong username/password combination</div>
+		{% endif %}
+		
+		{% if status == 0 or status == 2 %}
+		<div class = "center">Return to <a href="/">login page</a></div>
+		{% endif %}
+	</body>
+</html>
