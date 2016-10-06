@@ -28,6 +28,10 @@
 			.button {
 				display: inline-block;
 			}
+			form {
+				display: inline-block;
+				text-align: center;
+			}
 		</style>
 	</head>
 	<body>
@@ -51,7 +55,8 @@
 		{% endif %}
 		
 		{% if status != "login_OK" %}
-		<form class = "center" method = "POST" action="/auth/">
+		<center>
+		<form method = "POST" action="/auth/">
 			<input type="text" name="user">
 			<br>
 			<input type="password" name="pass">
@@ -59,6 +64,7 @@
 			<input class = "button" type="submit" name="auth_action" value="Register">
 			<input class = "button" type="submit" name="auth_action" value="Login">
 		</form>
+		</center>
 		{% endif %}
 	</body>
 </html>

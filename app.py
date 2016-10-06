@@ -55,7 +55,7 @@ def is_input_clean(username, password):
 #True - registration successful
 def register(username, password):
 	#Open file in append mode for account checking/adding:
-	user_store = open('data/user_store.csv', 'a')
+	user_store = open('data/user_store.csv', 'a+')
 	
 	#Check uniqueness
 	for entry in user_store:
@@ -65,7 +65,11 @@ def register(username, password):
 			
 	#Username is unique, proceed to store
 	#TODO: In the future, salt before hashing!!! Better yet, use an hmac!
-	user_store.write(username + ',' + hash256_dig(password))
+	
+	#DEBUG: print "Register: " + password
+	#DEBUG: print "Hashed register: " + hash256_dig(password)
+	
+	user_store.write(username + ',' + hash256_dig(password) + '\n')
 	user_store.close()
 	return True #signify successful registration
 	
@@ -79,8 +83,15 @@ def login(username, password):
 	for entry in user_store:
 		if entry.startswith(username):
 			#return whether given password matches given username
-			entry_pass = entry[len(username):]
+			entry_pass = entry[len(username)+1:-1]
+			
+			#DEBUG: print entry_pass
+			#DEBUG: print hash256_dig(password)
+			
 			user_store.close()
+			
+			#DEBUG: print entry_pass == hash256_dig(password)
+			
 			return entry_pass == hash256_dig(password)
 			
 	#No account found with this username
