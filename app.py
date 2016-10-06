@@ -9,7 +9,7 @@ app = Flask(__name__)
 #'login_OK' - Login success
 #'reg_bad_char' - Username or password contained illegal char
 #'reg_exists' - Account exists, prompt login
-#'login_Fail' - Login fail, prompt retry
+#'login_fail' - Login fail, prompt retry
 @app.route("/")
 @app.route("/auth/", methods=['GET', 'POST'])
 def authenticate():
@@ -39,7 +39,7 @@ def authenticate():
 				return render_template('auth.html', status='login_OK', uName=entered_name)
 			else:
 				#Failed login, prompt retry
-				return render_template('auth.html', status='login_Fail')
+				return render_template('auth.html', status='login_fail')
 
 #is_input_clean(username, password)
 #Returns false if either name contains , or " or ' or backslash

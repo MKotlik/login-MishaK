@@ -5,6 +5,13 @@
 		<style>
 			* {
 				font-family: Helvetica, Arial, sans-serif;
+				item-align: center;
+			}
+			.error {
+				color: red;
+			}
+			.success {
+				color: green;
 			}
 			.center {
 				margin: auto;
@@ -18,22 +25,40 @@
 			h1, h3 {
 				text-align: center;
 			}
+			.button {
+				display: inline-block;
+			}
 		</style>
 	</head>
 	<body>
 		<h1 class = "center spaced">Test Login Site</h1>
 		<h3 class = "center spaced">by Misha Kotlik</h3>
 		
-		{% if status == 0 %}
-		<div class = "center">Please log in first</div>
-		{% elif status == 1 %}
-		<div class = "center">You have logged in</div>
-		{% else %}
-		<div class = "center">Wrong username/password combination</div>
+		{% if status == 'GET' %}
+		<div>Register or log in.</div>
+		{% elif status == 'reg_OK' %}
+		<div class = "success">Account created. Please log in.</div>
+		{% elif status == 'reg_bad_char' %}
+		<div class = "error">Username and password cannot contain ' or " or , or \ <br>
+			Please try again.</div>
+		{% elif status == 'reg_exists' %}
+		<div class = "error">Username is taken.<br>
+			Please choose another name or log in.</div>
+		{% elif status == 'login_fail' %}
+		<div class = "error">Incorrect username or password. Please retry.</div>
+		{% else %} {# assume status='login_OK' #}
+		<div class = "success">Logged in successfully.</div>
 		{% endif %}
 		
-		{% if status == 0 or status == 2 %}
-		<div class = "center">Return to <a href="/">login page</a></div>
+		{% if status != "login_OK" %}
+		<form class = "center" method = "POST" action="/auth/">
+			<input type="text" name="user">
+			<br>
+			<input type="password" name="pass">
+			<br>
+			<input class = "button" type="submit" name="auth_action" value="Register">
+			<input class = "button" type="submit" name="auth_action" value="Login">
+		</form>
 		{% endif %}
 	</body>
 </html>
