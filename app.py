@@ -3,10 +3,6 @@ import hashlib
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-	return render_template('index.html')
-
 #Register/Login Page
 #Statuses: 'GET' - GET/plain open
 #'reg_OK' - Register success, prompt login
@@ -14,6 +10,7 @@ def index():
 #'reg_bad_char' - Username or password contained illegal char
 #'reg_exists' - Account exists, prompt login
 #'login_Fail' - Login fail, prompt retry
+@app.route("/")
 @app.route("/auth/", methods=['GET', 'POST'])
 def authenticate():
 	if request.method == 'GET': #GET request
@@ -25,7 +22,7 @@ def authenticate():
 		entered_pass = request.form['pass']
 		
 		if (request.form['auth_action'] == 'Register'): #Register attempt
-			#Check that names are clean (no , or " or ')
+			#Check that names are clean (no , or " or ' or backslash)
 			if not is_input_clean(entered_name, entered_pass):
 				return render_template('auth.html', status='reg_bad_char')
 			#Name is clean, proceed to register
@@ -38,17 +35,17 @@ def authenticate():
 				
 		else: #Login attempt
 			if login(entered_name, entered_pass) == True:
-				#Successful login, show msg
-				return render_template('auth.html', status='login_OK')
+				#Successful login, show msg w/ username
+				return render_template('auth.html', status='login_OK', uName=entered_name)
 			else:
 				#Failed login, prompt retry
 				return render_template('auth.html', status='login_Fail')
 
 #is_input_clean(username, password)
-#Returns false if either name contains , or " or '
+#Returns false if either name contains , or " or ' or backslash
 def is_input_clean(username, password):
-	if (',' in username or '"' in username or "'" in username
-			or ',' in password or '"' in password or "'" in password):
+	if (',' in username or '"' in username or "'" in username or "\\" in username
+			or ',' in password or '"' in password or "'" in password or "\\" in password):
 		return False; #input is dirty
 	else:
 		return True; #input is clean
@@ -63,11 +60,12 @@ def register(username, password):
 	#Check uniqueness
 	for entry in user_store:
 		if entry.startswith(username):
+			user_store.close()
 			return False #Account exists
 			
 	#Username is unique, proceed to store
 	#TODO: In the future, salt before hashing!!! Better yet, use an hmac!
-	user_store.write(username + ',' + hashlib.sha256(password).hexdigest())
+	user_store.write(username + ',' + hash256_dig(password))
 	user_store.close()
 	return True #signify successful registration
 	
@@ -81,10 +79,18 @@ def login(username, password):
 	for entry in user_store:
 		if entry.startswith(username):
 			#return whether given password matches given username
-			return entry[len(username):] == hashlib.sha256(password).hexdigest()
+			entry_pass = entry[len(username):]
+			user_store.close()
+			return entry_pass == hash256_dig(password)
 			
 	#No account found with this username
+	user_store.close()
 	return False
+	
+#hash256_dig
+#returns hexdigest of sha256 hash of input
+def hash256_dig(input):
+	return hashlib.sha256(input).hexdigest()
 	
 	
 app.debug = True #enable debugging
