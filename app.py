@@ -1,7 +1,21 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
+import os
 import hashlib
 
-app = Flask(__name__)
+app= Flask(__name__)
+
+#Config from config.py
+app.config.from_object('config')
+
+#Index/Welcome page
+#Sent here by default or when logged in
+@app.route("/")
+def index():
+    #Check if user logged in
+    if 'username' in session:
+        return render_template('index.html', user=session['username'])
+    else:
+        return redirect(url_for('authenticate'))
 
 #Register/Login Page
 #Statuses: 'GET' - GET/plain open
@@ -10,7 +24,6 @@ app = Flask(__name__)
 #'reg_bad_char' - Username or password contained illegal char
 #'reg_exists' - Account exists, prompt login
 #'login_fail' - Login fail, prompt retry
-@app.route("/")
 @app.route("/auth/", methods=['GET', 'POST'])
 def authenticate():
 	if request.method == 'GET': #GET request
@@ -35,8 +48,8 @@ def authenticate():
 				
 		else: #Login attempt
 			if login(entered_name, entered_pass) == True:
-				#Successful login, show msg w/ username
-				return render_template('auth.html', status='login_OK', uName=entered_name)
+				#Successful login, send to index.html
+				return redirect(url_for('index'))
 			else:
 				#Failed login, prompt retry
 				return render_template('auth.html', status='login_fail')
@@ -92,7 +105,10 @@ def login(username, password):
 			
 			#DEBUG: print entry_pass == hash256_dig(password)
 			
-			return entry_pass == hash256_dig(password)
+			if entry_pass == hash256_dig(password):
+                session['username'] = username #log user into session
+                return True
+            return False #password doesn't match
 			
 	#No account found with this username
 	user_store.close()
