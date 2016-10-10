@@ -5,6 +5,7 @@
 		<style>
 			* {
 				font-family: Helvetica, Arial, sans-serif;
+				item-align: center;
 			}
 			.center {
 				margin: auto;
@@ -13,9 +14,9 @@
 			}
 			div {
 				text-align: center;
-				margin-bottom: 10px;
+				margin-bottom: 20px;
 			}
-			h1, h3 {
+			h1, h3{
 				text-align: center;
 			}
 		</style>
@@ -24,14 +25,13 @@
 		<h1 class = "center spaced">Test Login Site</h1>
 		<h3 class = "center spaced">by Misha Kotlik</h3>
 		
-		<div class = "center">Please log in to continue</div>
+		<div class = "center spaced"><span font-size="1.5em"><b>{{ user }}</b></span>, you are logged in.</h5>
 		
-		<form class = "center" method = "POST" action="/auth/">
-			<input type="text" name="user">
-			<br>
-			<input type="password" name="pass">
-			<br>
-			<input type="submit" name="register">
+		<center>
+		<form class="center" method="POST" action="/">
+			<input type="submit" name="logout" value="Log Out">
 		</form>
+		</center>
+		
 	</body>
 </html>

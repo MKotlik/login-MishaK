@@ -1,21 +1,26 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-import os
 import hashlib
 
 app= Flask(__name__)
 
 #Config from config.py
 app.config.from_object('config')
+#app.secret_key = app.config['SECRET_KEY']
 
 #Index/Welcome page
 #Sent here by default or when logged in
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
-    #Check if user logged in
-    if 'username' in session:
-        return render_template('index.html', user=session['username'])
-    else:
-        return redirect(url_for('authenticate'))
+	#If user is logging out
+	if request.method == 'POST':
+		if 'logout' in request.form:
+			session.pop('username') #remove from session
+			return redirect(url_for('authenticate')) #redirect to login	
+    #Else, Check if user logged in
+	elif 'username' in session:
+		return render_template('index.html', user=session['username'])
+	else:
+		return redirect(url_for('authenticate'))
 
 #Register/Login Page
 #Statuses: 'GET' - GET/plain open
@@ -27,7 +32,11 @@ def index():
 @app.route("/auth/", methods=['GET', 'POST'])
 def authenticate():
 	if request.method == 'GET': #GET request
-		return render_template('auth.html', status='GET')
+		#Check if user is logged in
+		if 'username' in session: #If they are, send to welcome page (root)
+			return redirect(url_for('index'))
+		else: #else, display login/register form
+			return render_template('auth.html', status='GET')
 		
 	else: #POST request, form submission
 		#Get the username & password entered
@@ -40,7 +49,7 @@ def authenticate():
 				return render_template('auth.html', status='reg_bad_char')
 			#Name is clean, proceed to register
 			if register(entered_name, entered_pass) == True:
-				#Account created successfully, promppt login
+				#Account created successfully, prompt login
 				return render_template('auth.html', status='reg_OK')
 			else:
 				#Account already exists, prompt login
@@ -48,7 +57,7 @@ def authenticate():
 				
 		else: #Login attempt
 			if login(entered_name, entered_pass) == True:
-				#Successful login, send to index.html
+				#Successful login, send to Welcome (root)
 				return redirect(url_for('index'))
 			else:
 				#Failed login, prompt retry
@@ -90,28 +99,20 @@ def register(username, password):
 #Statuses: False - no such account or password mismatch
 #True - successfully authenticated
 def login(username, password):
-	#Open file in append mode for account checking:
-	user_store = open('data/user_store.csv', 'r')
-	
+	#Open file in read mode for account checking:
+	user_store = open('data/user_store.csv', 'a+')
+		
 	for entry in user_store:
 		if entry.startswith(username):
 			#return whether given password matches given username
-			entry_pass = entry[len(username)+1:-1]
-			
-			#DEBUG: print entry_pass
-			#DEBUG: print hash256_dig(password)
-			
-			user_store.close()
-			
-			#DEBUG: print entry_pass == hash256_dig(password)
-			
+			entry_pass = entry[len(username)+1:-1]	
+			#user_store.close()
 			if entry_pass == hash256_dig(password):
-                session['username'] = username #log user into session
-                return True
-            return False #password doesn't match
+				session['username'] = username #log user into session
+				return True #passwords match
 			
 	#No account found with this username
-	user_store.close()
+	#or password does not match
 	return False
 	
 #hash256_dig
